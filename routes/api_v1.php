@@ -3,12 +3,19 @@
 // user routes
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('post')->group(function () {
-    Route::get('/index', 'Post\PostApiController@index');
-    Route::post('/create', 'Post\PostApiController@createPost');
+Route::prefix('auth')->group(function() {
+    Route::post('', 'Auth\AuthApiController@register');
+    Route::post('login', 'Auth\AuthApiController@login');
 });
 
-Route::prefix('comment')->group(function () {
-    Route::get('/index', 'Comment\CommentApiController@index');
-    Route::post('/create', 'Comment\CommentApiController@createComment');
+Route::prefix('posts')->group(function () {
+    Route::get('', 'Post\PostApiController@index');
+    Route::get('byUser', 'Post\PostApiController@byUser');
+    Route::post('', 'Post\PostApiController@create');
+});
+
+Route::prefix('comments')->group(function () {
+    Route::get('', 'Comment\CommentApiController@index');
+    Route::post('', 'Comment\CommentApiController@create');
+    Route::get('forPost/{post_id}', 'Comment\CommentApiController@forPost');
 });

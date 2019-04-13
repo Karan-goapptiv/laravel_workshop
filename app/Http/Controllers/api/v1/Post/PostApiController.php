@@ -4,11 +4,11 @@ namespace App\Http\Controllers\api\v1\Post;
 
 
 use App\Http\Controllers\api\BaseApiController;
+use App\Http\Requests\CreatePostRequest;
+use App\Http\RestResponse;
 use App\Http\Services\AuthorizationService;
-use App\Library\NewRepositoriesPattern\RestResponse;
+use App\Models\Post\Post;
 use App\Services\Post\PostService;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class PostApiController extends BaseApiController {
 
@@ -19,7 +19,8 @@ class PostApiController extends BaseApiController {
     public $authService;
 
     /**
-     * CommentApiController constructor.
+     * Constructor.
+     *
      * @param PostService $postService
      * @param AuthorizationService $authService
      */
@@ -37,7 +38,21 @@ class PostApiController extends BaseApiController {
     public function index() {
 
         // fetch comments
-        $post = $this->postService->findAll();
+        $post = $this->postService->find();
+
+        // return followUps in json format
+        return RestResponse::done('posts', $post);
+    }
+
+    /**
+     * Get all posts
+     *
+     * @return mixed
+     */
+    public function byUser() {
+
+        // fetch comments
+        $post = $this->postService->findByUser($this->authService->user->id);
 
         // return followUps in json format
         return RestResponse::done('posts', $post);
@@ -46,23 +61,18 @@ class PostApiController extends BaseApiController {
     /**
      * Create Post
      *
-     * @param Request $request
+     * @param CreatePostRequest $request
      * @return mixed
      */
-    public function createPost(Request $request) {
+    public function create(CreatePostRequest $request) {
+        // prepare fields
+        $fields = $request->getFields();
+        $fields['user_id'] = $this->authService->user->id;
 
-        $post = null;
-        if(isset($request)) {
-            $post = $this->postService->store([
-                "title" => $request->get('title'),
-                "description" => $request->get('description'),
-//                "user_id" => $this->authService->user->id,
-                "user_id" => $request->get('user_id'),
-                "created_at" => Carbon::now(),
-                "updated_at" => Carbon::now()
-            ]);
-        }
+        // create
+        $post = Post::create($fields);
 
+        // response
         return RestResponse::done('post', $post);
     }
 }

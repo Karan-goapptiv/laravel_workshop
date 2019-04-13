@@ -4,11 +4,11 @@ namespace App\Http\Controllers\api\v1\Comment;
 
 
 use App\Http\Controllers\api\BaseApiController;
+use App\Http\Requests\CreateCommentRequest;
+use App\Http\RestResponse;
 use App\Http\Services\AuthorizationService;
-use App\Library\NewRepositoriesPattern\RestResponse;
+use App\Models\Comment\Comment;
 use App\Services\Comment\CommentService;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class CommentApiController extends BaseApiController {
 
@@ -44,25 +44,36 @@ class CommentApiController extends BaseApiController {
     }
 
     /**
-     * Create Comment
+     * Get all comments
      *
-     * @param Request $request
+     * @param $post_id
      * @return mixed
      */
-    public function createComment(Request $request) {
+    public function forPost($post_id) {
 
-        $comment = null;
-        if(isset($request)) {
-            $comment = $this->commentService->store([
-                "comment" => $request->get('comment'),
-                "post_id" => $request->get('post_id'),
-//                "user_id" => $this->authService->user->id,
-                "user_id" => $request->get('user_id'),
-                "created_at" => Carbon::now(),
-                "updated_at" => Carbon::now()
-            ]);
-        }
+        // fetch comments
+        $comments = $this->commentService->findForPostId($post_id, [], $this->length);
 
+        // return followUps in json format
+        return RestResponse::done('comments', $comments);
+    }
+
+    /**
+     * Create Comment
+     *
+     * @param CreateCommentRequest $request
+     * @return mixed
+     */
+    public function create(CreateCommentRequest $request) {
+
+        // prepare fields
+        $fields = $request->getFields();
+        $fields['user_id'] = $this->authService->user->id;
+
+        // create
+        $comment = Comment::create($fields);
+
+        // response
         return RestResponse::done('comment', $comment);
     }
 }

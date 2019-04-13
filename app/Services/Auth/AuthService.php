@@ -1,28 +1,22 @@
 <?php namespace App\Services\Auth;
 
-use App\Http\Criteria\User\ForAuthTokenAndNotNull;
-use App\Library\NewRepositoriesPattern\Abstracts\CriteriaBuilder;
-use App\Library\NewRepositoriesPattern\Abstracts\Service;
+use App\Models\User\User;
 use App\Repositories\User\UserRepository;
-use Illuminate\Database\DatabaseManager;
 
-/**
- * Class AuthService
- *
- * @package App\Services\Auth
- */
-class AuthService extends Service {
+class AuthService {
 
-    public $authService;
+    /**
+     * @var UserRepository
+     */
+    protected $Repository;
 
     /**
      * AuthService Constructor
      *
      * @param UserRepository $repository
-     * @param DatabaseManager $db
      */
-    public function __construct(UserRepository $repository, DatabaseManager $db) {
-        parent::__construct($repository, $db);
+    public function __construct(UserRepository $repository) {
+        $this->Repository = $repository;
     }
 
     /**
@@ -33,37 +27,51 @@ class AuthService extends Service {
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function get($id, $with = []) {
+        $model = User::with($with);
 
-        // get builder
-        $builder = (new CriteriaBuilder($this, $with));
-
-        // return first instance
-        return $this->Repository->get($builder, $id);
+        // fetch first
+        return $model->find($id);
     }
 
     /**
-     * For Token
+     * Get user by mobile
      *
-     * @param $authToken
+     * @param $mobile
      * @param array $with
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function getByAuthToken($authToken, array $with = []) {
-        // prepare builder
-        $builder = new CriteriaBuilder($this, $with);
+    public function getByMobile($mobile, array $with = []) {
+        $user_table = User::$tableName;
 
-        // filter
-        $builder->add(new ForAuthTokenAndNotNull($authToken));
+        // prepare model
+        $model = User::with($with);
+
+        // filter by mobile
+        $model->where("$user_table.mobile", $mobile)
+            ->whereNotNull("$user_table.mobile");
 
         // fetch first
-        return $this->Repository->first($builder);
+        return $model->first();
     }
 
     /**
-     * Add auth filters
+     * Get user by auth token
      *
-     * @param CriteriaBuilder $builder
+     * @param $auth_token
+     * @param array $with
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function addBasicFilters(CriteriaBuilder $builder) {
+    public function getByAuthToken($auth_token, array $with = []) {
+        $user_table = User::$tableName;
+
+        // prepare model
+        $model = User::with($with);
+
+        // filter by auth token
+        $model->where("$user_table.auth_token", $auth_token)
+            ->whereNotNull("$user_table.auth_token");
+
+        // fetch first
+        return $model->first();
     }
 }

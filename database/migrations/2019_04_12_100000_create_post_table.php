@@ -1,23 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreatePostTable extends Migration
-{
+class CreatePostTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         // post table
         Schema::create('POSTS', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title');
-            $table->string('description');
+            $table->longText('description');
             $table->bigInteger('no_of_comments')->nullable();
 
             // user relation
@@ -30,7 +28,7 @@ class CreatePostTable extends Migration
         // comments table
         Schema::create('COMMENTS', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('comment');
+            $table->longText('comment');
 
             // user relation
             $table->bigInteger('post_id')->unsigned()->nullable();
@@ -49,8 +47,7 @@ class CreatePostTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('POSTS');
         Schema::dropIfExists('COMMENTS');
     }

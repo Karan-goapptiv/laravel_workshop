@@ -2,7 +2,6 @@
 
 namespace App\Http\Services;
 
-use App\Models\User\User;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -20,6 +19,7 @@ class AuthorizationService {
      * @var
      */
     public $user;
+
     /**
      * @var AuthService
      */
@@ -34,15 +34,6 @@ class AuthorizationService {
     public $permissions = [];
 
     /**
-     * role booleans
-     *
-     * @var
-     */
-    public $isDoctor = false;
-    public $isCountry = false;
-    public $isSupperAdmin = false;
-
-    /**
      * AuthorizationService constructor.
      *
      * @param Request $request
@@ -52,11 +43,11 @@ class AuthorizationService {
         $this->authService = app(AuthService::class);
 
         // get auth token from header
-        $auth_token = $request->header('GA-Authorization');
+        $auth_token = $request->header('Auth-Token');
 
         // if not present get token from cookie
         if (!isset($auth_token) || empty($auth_token))
-            $auth_token = Cookie::get('GA-Authorization');
+            $auth_token = Cookie::get('Auth-Token');
 
         // set user
         $this->setUser($auth_token);
@@ -65,13 +56,12 @@ class AuthorizationService {
     /**
      * set user
      *
-     * @param $authToken
+     * @param $auth_token
      */
-    public function setUser($authToken) {
-         $this->user = User::first();
-//        if (isset($authToken)) {
-//            $this->user = $this->authService
-//                ->getByAuthToken($authToken, []);
-//        }
+    public function setUser($auth_token) {
+        if (isset($auth_token)) {
+            $this->user = $this->authService
+                ->getByAuthToken($auth_token, []);
+        }
     }
 }

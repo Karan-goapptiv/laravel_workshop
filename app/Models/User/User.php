@@ -10,10 +10,10 @@ class User extends TraceableBaseModel {
      *
      * @var string
      */
-    protected $table = 'USERS';
+    public static $tableName = 'USERS';
 
     /**
-     * The attributes that are mass assignable.
+     * Guarded fields
      *
      * @var array
      */
@@ -25,21 +25,18 @@ class User extends TraceableBaseModel {
      * @var array
      */
     protected $hidden = [
-        'password', 'created_at', 'updated_at'
+        'password', 'created_at', 'updated_at', 'auth_token', 'remember_token'
     ];
 
     /**
      * Prepare user json with auth token
      */
-    public function jsonWithAuthToken() {
-
-        // convert to array
+    public function toAuthArray() {
         $userJson = $this->toArray();
 
         // set auth token
         $userJson['auth_token'] = $this->auth_token;
 
-        // return
         return $userJson;
     }
 }
