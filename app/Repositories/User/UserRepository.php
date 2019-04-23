@@ -2,13 +2,9 @@
 
 namespace App\Repositories\User;
 
-use App\Library\NewRepositoriesPattern\Abstracts\Repository;
 use App\Models\User\User;
 
-/**
- * Class UserRepository
- */
-class UserRepository extends Repository {
+class UserRepository {
 
     /**
      * Set User entity

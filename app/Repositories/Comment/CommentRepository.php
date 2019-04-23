@@ -2,13 +2,9 @@
 
 namespace App\Repositories\Comment;
 
-use App\Library\NewRepositoriesPattern\Abstracts\Repository;
 use App\Models\Comment\Comment;
 
-/**
- * Class CommentRepository
- */
-class CommentRepository extends Repository {
+class CommentRepository {
 
     /**
      * Set Post entity
@@ -26,14 +22,28 @@ class CommentRepository extends Repository {
      * @param int $length
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function findAll($with = [], $length = 50) {
-        // tables
+    public function find($with = [], $length = 50) {
         $comment_table = Comment::$tableName;
 
-        $model = Comment::with($with);
+        // paginate result
+        return Comment::with($with)->select("$comment_table.*")->paginate($length);
+    }
+
+    /**
+     * Find all comments for post
+     *
+     * @param $post_id
+     * @param array $with
+     * @param int $length
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function findForPostId($post_id, $with = [], $length = 50) {
+        $comment_table = Comment::$tableName;
+
+        // filter for post
+        $model = Comment::with($with)->where("$comment_table.post_id", $post_id);
 
         // paginate result
         return $model->select("$comment_table.*")->paginate($length);
-
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Library\NewRepositoriesPattern;
+namespace App\Http;
 
 use Illuminate\Http\Response as ResponseConstants;
 use Illuminate\Pagination\LengthAwarePaginator;

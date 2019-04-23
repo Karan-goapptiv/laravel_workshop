@@ -3,16 +3,10 @@
 namespace App\Services\Comment;
 
 use App\Http\Services\AuthorizationService;
-use App\Library\NewRepositoriesPattern\Abstracts\Service;
 use App\Repositories\Comment\CommentRepository;
-use Illuminate\Database\DatabaseManager;
 
-/**
- * Class CommentService
- *
- * @package App\Services\CommentService
- */
-class CommentService extends Service {
+
+class CommentService {
 
     /**
      * @var CommentRepository
@@ -28,13 +22,11 @@ class CommentService extends Service {
      * CommentService constructor
      *
      * @param CommentRepository $repository
-     * @param DatabaseManager $db
      * @param AuthorizationService $authService
      */
     public function __construct(CommentRepository $repository,
-                                DatabaseManager $db,
                                 AuthorizationService $authService) {
-        parent::__construct($repository, $db);
+        $this->Repository = $repository;
         $this->authService = $authService;
     }
 
@@ -46,17 +38,18 @@ class CommentService extends Service {
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function findAll($with = [], $length = 50) {
-        return $this->Repository->findAll($with, $length);
+        return $this->Repository->find($with, $length);
     }
 
     /**
-     * Create comment
+     * Find all comments for post id
      *
-     * @param $fields
-     * @return mixed
+     * @param $post_id
+     * @param array $with
+     * @param int $length
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function store($fields) {
-        return $this->Repository->create($fields);
+    public function findForPostId($post_id, $with = [], $length = 50) {
+        return $this->Repository->findForPostId($post_id, $with, $length);
     }
-
 }
